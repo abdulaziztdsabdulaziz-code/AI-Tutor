@@ -1,0 +1,27 @@
+# Environment variables (NEVER COMMIT SECRETS)
+.env
+*.env
+
+# Python byte code and caches
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Virtual Environments
+venv/
+.venv/
+env/
+ENV/
+
+# SQLite databases
+*.db
+*.sqlite
+*.sqlite3
+
+# IDEs & System files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.log

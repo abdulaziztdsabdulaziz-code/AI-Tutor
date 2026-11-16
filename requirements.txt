@@ -1,0 +1,26 @@
+# ==============================================================================
+# Telegram AI-Tutor & Multimodal Powerhouse (Antigravity Edition)
+# Production Dependencies
+# ==============================================================================
+
+# ── Core Framework & Webhook Engine ───────────────────────────────────────────
+aiogram==3.17.0
+fastapi==0.115.5
+uvicorn[standard]==0.32.1
+
+# ── Configuration & Validation ────────────────────────────────────────────────
+pydantic-settings==2.6.1
+python-dotenv==1.0.1
+
+# ── Asynchronous Database & Connection Pool ───────────────────────────────────
+aiosqlite==0.20.0
+
+# ── Multi-Model AI Router (OpenRouter via AsyncOpenAI) ─────────────────────────
+openai==1.57.0
+httpx==0.28.0
+
+# ── Voice Transcription & Speaker Diarization (Deepgram API via httpx) ────────
+# Note: Diarization uses high-performance direct async streaming via httpx
+
+# ── Chess Master & Stockfish Interface ────────────────────────────────────────
+chess==1.11.1
