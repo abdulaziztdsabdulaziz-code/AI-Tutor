@@ -44,7 +44,7 @@ MODEL_REGISTRY: dict[str, ModelConfig] = {
         model_id="anthropic/claude-3.7-sonnet",
         display_name="Claude 3.7 Sonnet",
         emoji="🧠",
-        description="Deep code analysis, architecture & tutoring logic",
+        description="Deep code analysis, architecture &amp; tutoring logic",
         fallback_key="gpt-4o",
     ),
     "gpt-4o": ModelConfig(
@@ -60,7 +60,7 @@ MODEL_REGISTRY: dict[str, ModelConfig] = {
         model_id="google/gemini-2.5-pro",
         display_name="Gemini 2.5 Pro",
         emoji="✨",
-        description="Large context processing & reasoning",
+        description="Large context processing &amp; reasoning",
         fallback_key="claude-3-7-sonnet",
     ),
     "deepseek-r1": ModelConfig(
@@ -68,7 +68,7 @@ MODEL_REGISTRY: dict[str, ModelConfig] = {
         model_id="deepseek/deepseek-r1",
         display_name="DeepSeek R1 / V3",
         emoji="🔢",
-        description="Advanced mathematics & step-by-step logic",
+        description="Advanced mathematics &amp; step-by-step logic",
         fallback_key="gpt-4o",
     ),
     "grok": ModelConfig(
@@ -76,7 +76,7 @@ MODEL_REGISTRY: dict[str, ModelConfig] = {
         model_id="x-ai/grok-2-1212",
         display_name="Grok",
         emoji="⚡",
-        description="Creativity & real-time context",
+        description="Creativity &amp; real-time context",
         fallback_key="gpt-4o",
     ),
 }

@@ -185,12 +185,15 @@ async def telegram_webhook(
             detail="Forbidden: invalid X-Telegram-Bot-Api-Secret-Token",
         )
 
-    body = await request.json()
-    update = Update.model_validate(body)
+    try:
+        body = await request.json()
+        update = Update.model_validate(body)
 
-    bot: Bot = app.state.bot
-    dp: Dispatcher = app.state.dp
-    await dp.feed_update(bot=bot, update=update)
+        bot: Bot = app.state.bot
+        dp: Dispatcher = app.state.dp
+        await dp.feed_update(bot=bot, update=update)
+    except Exception as exc:  # noqa: BLE001
+        logger.exception("Error processing webhook update: %s", exc)
 
     return JSONResponse(content={"ok": True})
 

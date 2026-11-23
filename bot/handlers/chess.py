@@ -47,7 +47,7 @@ async def handle_chess_menu(
 
     await message.answer(
         text=(
-            "♟ <b>Шахматный Гроссмейстер & Анализатор позиций</b>\n\n"
+            "♟ <b>Шахматный Гроссмейстер &amp; Анализатор позиций</b>\n\n"
             "Выберите способ задания позиции:\n\n"
             "• <b>📋 FEN-нотация</b> — вставьте строку FEN (любая позиция)\n"
             "  <i>Пример: rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1</i>\n\n"
