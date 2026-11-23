@@ -44,6 +44,7 @@ from bot.middlewares import (
 from bot.services.chess_engine import ChessEngine
 from bot.services.diarization_client import DiarizationClient
 from bot.services.llm_client import LLMRouter
+from bot.services.mcp_server import MCPServer
 
 # ── Logging Configuration ─────────────────────────────────────────────────────
 
@@ -75,6 +76,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     llm = LLMRouter(api_key=settings.OPENROUTER_API_KEY)
     diarization = DiarizationClient(api_key=settings.DEEPGRAM_API_KEY)
     chess_engine = ChessEngine(stockfish_path=settings.STOCKFISH_PATH)
+    mcp_server = MCPServer(chess_engine=chess_engine)
 
     # 3. aiogram Bot Instance
     bot = Bot(
@@ -105,10 +107,11 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
 
     # 7. Telegram Webhook Registration
     webhook_url = f"{settings.WEBHOOK_URL.rstrip('/')}{settings.WEBHOOK_PATH}"
+    clean_secret = settings.WEBHOOK_SECRET.strip().strip("'\"")
     try:
         await bot.set_webhook(
             url=webhook_url,
-            secret_token=settings.WEBHOOK_SECRET,
+            secret_token=clean_secret,
             allowed_updates=dp.resolve_used_update_types(),
             drop_pending_updates=True,
         )
@@ -131,6 +134,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     app.state.llm = llm
     app.state.diarization = diarization
     app.state.chess = chess_engine
+    app.state.mcp = mcp_server
 
     yield  # Server runs handling incoming webhook requests
 
@@ -198,6 +202,31 @@ async def telegram_webhook(
     return JSONResponse(content={"ok": True})
 
 
+# ── Model Context Protocol (MCP) Endpoint ──────────────────────────────────────
+
+@app.post("/mcp", include_in_schema=False)
+async def mcp_endpoint(request: Request) -> JSONResponse:
+    """
+    Model Context Protocol (MCP) JSON-RPC 2.0 endpoint.
+    Supports initialize, tools/list, and tools/call.
+    """
+    try:
+        body = await request.json()
+        mcp_server: MCPServer = app.state.mcp
+        response = await mcp_server.handle_jsonrpc(body)
+        return JSONResponse(content=response)
+    except Exception as exc:
+        logger.exception("Error processing MCP JSON-RPC request: %s", exc)
+        return JSONResponse(
+            status_code=400,
+            content={
+                "jsonrpc": "2.0",
+                "id": None,
+                "error": {"code": -32700, "message": f"Parse error: {exc}"},
+            },
+        )
+
+
 # ── Health Probe ──────────────────────────────────────────────────────────────
 
 @app.get("/health", include_in_schema=False)
@@ -216,6 +245,8 @@ async def health_check() -> JSONResponse:
             "bot": bot_name,
             "webhook_path": settings.WEBHOOK_PATH,
             "models_available": 5,
+            "mcp_enabled": True,
+            "mcp_tools": 3,
         },
         status_code=200,
     )

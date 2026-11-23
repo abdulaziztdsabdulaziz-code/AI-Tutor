@@ -23,6 +23,7 @@ def verify_telegram_secret_token(
     Validate incoming Telegram secret token header against expected secret.
 
     Uses constant-time comparison (hmac.compare_digest) to prevent timing attacks.
+    Defensively strips whitespace and quotes to prevent configuration mismatch.
 
     Parameters
     ----------
@@ -38,7 +39,9 @@ def verify_telegram_secret_token(
     """
     if not received_token or not expected_token:
         return False
-    return hmac.compare_digest(received_token, expected_token)
+    clean_received = received_token.strip().strip("'\"")
+    clean_expected = expected_token.strip().strip("'\"")
+    return hmac.compare_digest(clean_received, clean_expected)
 
 
 class WebhookSecurityMiddleware(BaseHTTPMiddleware):

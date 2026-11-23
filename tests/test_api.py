@@ -44,7 +44,50 @@ async def test_fastapi_endpoints() -> None:
         assert resp_bad_tok.status_code == 403
         print("✅ POST /webhook (wrong token -> 403) passed")
 
-    print("🎉 All FastAPI HTTP integration tests passed!")
+        # 4. MCP JSON-RPC protocol tests
+        from bot.services.chess_engine import ChessEngine
+        from bot.services.mcp_server import MCPServer
+        app.state.mcp = MCPServer(chess_engine=ChessEngine())
+
+        # Test initialize
+        resp_mcp_init = await client.post(
+            "/mcp",
+            json={"jsonrpc": "2.0", "id": 1, "method": "initialize"},
+        )
+        assert resp_mcp_init.status_code == 200
+        init_data = resp_mcp_init.json()
+        assert init_data["result"]["serverInfo"]["name"] == "ai-tutor-mcp-server"
+        print("✅ POST /mcp (initialize) passed:", init_data["result"]["serverInfo"])
+
+        # Test tools/list
+        resp_mcp_list = await client.post(
+            "/mcp",
+            json={"jsonrpc": "2.0", "id": 2, "method": "tools/list"},
+        )
+        assert resp_mcp_list.status_code == 200
+        tools_data = resp_mcp_list.json()
+        assert len(tools_data["result"]["tools"]) >= 3
+        print("✅ POST /mcp (tools/list) passed with", len(tools_data["result"]["tools"]), "tools")
+
+        # Test tools/call evaluate_mathematics
+        resp_mcp_call = await client.post(
+            "/mcp",
+            json={
+                "jsonrpc": "2.0",
+                "id": 3,
+                "method": "tools/call",
+                "params": {
+                    "name": "evaluate_mathematics",
+                    "arguments": {"expression": "sqrt(144) + 10"},
+                },
+            },
+        )
+        assert resp_mcp_call.status_code == 200
+        call_data = resp_mcp_call.json()
+        assert "Result: 22.0" in call_data["result"]["content"][0]["text"]
+        print("✅ POST /mcp (tools/call evaluate_mathematics) passed: 22.0")
+
+    print("🎉 All FastAPI HTTP & MCP integration tests passed!")
 
 
 if __name__ == "__main__":

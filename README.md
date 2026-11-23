@@ -266,6 +266,22 @@ curl http://localhost:8443/health
 
 ---
 
+## 🔌 Model Context Protocol (MCP) Server
+
+The AI-Tutor platform exposes a standard Anthropic **Model Context Protocol (MCP)** JSON-RPC 2.0 server at `POST /mcp`, allowing external agentic orchestrators, desktop AI clients (Claude Desktop, Antigravity), and developer tools to connect directly and invoke tools.
+
+### Supported Methods
+- `initialize`: Returns protocol version (`2024-11-05`), server capabilities, and identity.
+- `tools/list`: Lists registered tools with JSON Schema definitions.
+- `tools/call`: Executes specified tool with validated parameters.
+
+### Registered MCP Tools
+1. **`analyze_chess_position`**: Evaluates FEN board states or PGN move sequences using Stockfish depth-18 or PST fallback.
+2. **`evaluate_mathematics`**: High-precision academic math evaluation supporting algebra, trigonometry, and logarithms.
+3. **`get_system_status`**: Live telemetry on active models, database pool state, and system health.
+
+---
+
 ## 🎓 Academic Defense Guide (Q&A for Professor)
 
 ### Q1: Why FastAPI + Webhooks instead of standard Long Polling?
