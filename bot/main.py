@@ -140,10 +140,8 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
 
     # ── Graceful Shutdown Sequence ─────────────────────────────────────────────
     logger.info("Executing graceful shutdown...")
-    try:
-        await bot.delete_webhook(drop_pending_updates=False)
-    except Exception as exc:  # noqa: BLE001
-        logger.debug("Webhook deletion notice: %s", exc)
+    # NOTE: In production cloud environments (Railway, Docker), we do NOT delete the webhook
+    # during container shutdown to avoid unregistering it when rolling updates overlap.
 
     await bot.session.close()
     await diarization.aclose()
